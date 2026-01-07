@@ -20,8 +20,8 @@ app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    // Allow localhost on any port
-    if (origin.match(/^http:\/\/localhost:\d+$/)) return callback(null, true);
+    // Allow skilltobill-backend.onrender.com on any port
+    if (origin.match(/^http:\/\/skilltobill-backend.onrender.com:\d+$/)) return callback(null, true);
     // Allow 127.0.0.1 on any port
     if (origin.match(/^http:\/\/127\.0\.0\.1:\d+$/)) return callback(null, true);
     return callback(new Error('Not allowed by CORS'));

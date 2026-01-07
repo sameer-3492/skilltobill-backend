@@ -4647,7 +4647,7 @@ Create a `.env` file in backend root:
 
 ```
 PORT=5000
-MONGO_URI=your_mongodb_uri
+MONGO_URI=mongodb+srv://skilltobill469_db_user:stb469@khushi.ezlifwq.mongodb.net/stb?retryWrites=true&w=majority
 JWT_SECRET=your_secret_key
 RAZORPAY_KEY_ID=your_key_id
 RAZORPAY_KEY_SECRET=your_key_secret
@@ -4674,7 +4674,7 @@ npm install
 npm start
 ```
 
-Backend runs on `http://localhost:5000`
+Backend runs on `http://skilltobill-backend.onrender.com:5000`
 
 ---
 
