@@ -5,26 +5,37 @@ import { fileURLToPath } from 'url';
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import app from './app.js';  // tumhara routes / middleware defined app
+import app from './app.js'; // routes defined here
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load .env
+// Load env
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
 // ------------------
-// Express Middlewares
+// Express middlewares
 // ------------------
-app.use(express.json()); // parse JSON bodies
+app.use(express.json());
+
+// Full CORS setup
 app.use(cors({
     origin: 'https://skilltobill.onrender.com', // frontend URL
     methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+    allowedHeaders: ['Content-Type','Authorization'],
+    credentials: true
+}));
+
+// Handle OPTIONS preflight request for all routes
+app.options('*', cors({
+    origin: 'https://skilltobill.onrender.com',
+    methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+    allowedHeaders: ['Content-Type','Authorization'],
     credentials: true
 }));
 
 // ------------------
-// MongoDB + Server
+// MongoDB + server start
 // ------------------
 const PORT = process.env.PORT || 5000;
 
