@@ -13,27 +13,45 @@ import contactRoutes from './routes/contact.routes.js';
 
 const app = express();
 
+// ------------------
+// Middleware
+// ------------------
 app.use(helmet());
 app.use(compression());
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    // Allow skilltobill-backend.onrender.com on any port
-    if (origin.match(/^http:\/\/skilltobill-backend.onrender.com:\d+$/)) return callback(null, true);
-    // Allow 127.0.0.1 on any port
-    if (origin.match(/^http:\/\/127\.0\.0\.1:\d+$/)) return callback(null, true);
-    return callback(new Error('Not allowed by CORS'));
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-
 app.use(express.json());
 app.use(morgan('dev'));
 
+// ------------------
+// CORS
+// ------------------
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // mobile apps or curl
+    // Allow frontend deployed domain
+    if (origin.includes('skilltobill.onrender.com')) return callback(null, true);
+    // Allow local dev
+    if (origin.includes('127.0.0.1')) return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
+  },
+  methods: ['GET','POST','PUT','DELETE'],
+  allowedHeaders: ['Content-Type','Authorization'],
+  credentials: true
+}));
+
+// ------------------
+// Root + Health check
+// ------------------
+app.get('/', (req, res) => {
+  res.send('SkillToBill Backend is live 🚀');
+});
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date() });
+});
+
+// ------------------
+// API Routes
+// ------------------
 app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/orders', orderRoutes);
