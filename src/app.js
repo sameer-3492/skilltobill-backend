@@ -28,9 +28,9 @@ app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true); // mobile apps or curl
     // Allow frontend deployed domain
-    if (origin.includes('skilltobill.onrender.com')) return callback(null, true);
+    if (origin.match(/^https?:\/\/[a-zA-Z0-9-]*\.?skilltobill\.onrender\.com(:\d+)?$/)) return callback(null, true);
     // Allow local dev
-    if (origin.includes('127.0.0.1')) return callback(null, true);
+    if (origin.match(/^https?:\/\/127\.0\.0\.1(:\d+)?$/)) return callback(null, true);
     return callback(new Error('Not allowed by CORS'));
   },
   methods: ['GET','POST','PUT','DELETE'],
