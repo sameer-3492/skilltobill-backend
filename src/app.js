@@ -24,18 +24,39 @@ app.use(morgan('dev'));
 // ------------------
 // CORS
 // ------------------
+const allowedOrigins = [
+  'https://skilltobill.onrender.com',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  process.env.FRONTEND_URL // Railway में environment variable से
+];
+
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true); // mobile apps or curl
-    // Allow frontend deployed domain
-    if (origin.match(/^https?:\/\/[a-zA-Z0-9-]*\.?skilltobill\.onrender\.com(:\d+)?$/)) return callback(null, true);
-    // Allow local dev
-    if (origin.match(/^https?:\/\/127\.0\.0\.1(:\d+)?$/)) return callback(null, true);
+    
+    // Check if origin is in allowed list
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Check regex patterns for Render subdomains
+    if (origin.match(/^https?:\/\/[a-zA-Z0-9-]*\.?skilltobill\.onrender\.com(:\d+)?$/)) {
+      return callback(null, true);
+    }
+    
+    // Allow localhost development
+    if (origin.match(/^https?:\/\/127\.0\.0\.1(:\d+)?$/) || origin.match(/^https?:\/\/localhost(:\d+)?$/)) {
+      return callback(null, true);
+    }
+    
+    console.warn(`CORS rejected origin: ${origin}`);
     return callback(new Error('Not allowed by CORS'));
   },
-  methods: ['GET','POST','PUT','DELETE'],
+  methods: ['GET','POST','PUT','DELETE','PATCH','OPTIONS'],
   allowedHeaders: ['Content-Type','Authorization'],
-  credentials: true
+  credentials: true,
+  maxAge: 86400 // 24 hours
 }));
 
 // ------------------
@@ -58,5 +79,16 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/contact', contactRoutes);
+
+// ------------------
+// Error Handling
+// ------------------
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(err.status || 500).json({
+    message: err.message || 'Internal Server Error',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+  });
+});
 
 export default app;
